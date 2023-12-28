@@ -65,8 +65,8 @@ mainFrame = gcf;
 titleFrame = uipanel('parent', mainFrame, 'backgroundcolor', titleBackgroundColor, 'position', [0 0.9 1 0.1]);
 coffeeSelectionFrame = uipanel('parent', mainFrame, 'backgroundcolor', backgroundColor, 'position', [0 0 1 0.9]);
 
-% Text to display the title and the current time
-titleText = uicontrol('parent', titleFrame, 'units', 'normalized', 'style', 'text', 'string', 'Taste', 'fontsize', 21, 'fontname', 'Calibri', 'backgroundcolor', titleBackgroundColor, 'foregroundcolor', titleTextColor, 'position', [0.25 0 0.5 1], 'horizontalalignment', 'center', 'fontweight', 'bold');
+% Text to display the current time
+titleText = uicontrol('parent', titleFrame, 'units', 'normalized', 'style', 'text', 'string', 'taste', 'fontsize', 23, 'fontname', 'Georgia', 'backgroundcolor', titleBackgroundColor, 'foregroundcolor', titleTextColor, 'position', [0.25 0 0.5 1], 'horizontalalignment', 'center', 'fontweight', 'bold');
 clockText = uicontrol('parent', titleFrame, 'units', 'normalized', 'style', 'text', 'string', datestr(now, 'HH:MM'), 'fontsize', 16, 'fontname', 'Calibri', 'backgroundcolor', titleBackgroundColor, 'foregroundcolor', titleTextColor, 'position', [0.8 0 0.25 1], 'horizontalalignment', 'center', 'fontweight', 'bold');
 
 spacing = 0.03;
@@ -180,29 +180,28 @@ end
 
 % This function handles the insertion of coins into the machine and change calculation
 function insertMoneyCallback(hObject, eventdata, amount, coffeeIndex, mainFrame, miniWindow)
-machineData = guidata(mainFrame);
-backgroundColor = hex2dec({'FF','FA','F0'})'/255;
-coffeeTextColor = hex2dec({'00','00','00'})'/255;
+    machineData = guidata(mainFrame);
 
-machineData.totalInserted = 0;
-machineData.totalInserted = machineData.totalInserted + amount;
-remainingAmount = machineData.coffeePrices(coffeeIndex) - machineData.totalInserted;
+    if ~isfield(machineData, 'totalInserted')
+        machineData.totalInserted = 0;
+    end
 
-if remainingAmount > 0
-    set(machineData.userPrompt, 'string', sprintf('Please insert $%.2f more.', remainingAmount));
-    machineData.coffeePaid = 0;
-elseif remainingAmount <= 0
-    change = abs(remainingAmount);
-    set(machineData.userPrompt, 'string', sprintf('Brewing %s. Change: $%.2f.', machineData.coffeeTypes{coffeeIndex}, change));
-    machineData.coffeePaid = 1;
-    machineData.hasChange = 1;
-    machineData.coffeePrices(coffeeIndex) = 0;
-    machineData.totalInserted = 0;
-set(machineData.collectCoffee, 'enable', 'off');
+    machineData.totalInserted = machineData.totalInserted + amount;
+    remainingAmount = machineData.coffeePrices(coffeeIndex) - machineData.totalInserted;
+    if remainingAmount > 0
+        set(machineData.userPrompt, 'string', sprintf('Please insert $%.2f more.', abs(remainingAmount)));
+        machineData.coffeePaid = 0;
+    else
+        change = abs(remainingAmount);
+        set(machineData.userPrompt, 'string', sprintf('Brewing %s. Change: $%.2f.', machineData.coffeeTypes{coffeeIndex}, change));
+        machineData.coffeePaid = 1;
+        machineData.hasChange = 1;
+    end
+
+    set(machineData.collectCoffee, 'enable', 'off');
+    guidata(mainFrame, machineData);
 end
 
-guidata(mainFrame, machineData);
-end
 
 % Playing sound while coffee is being brewed
 function playAudio()
