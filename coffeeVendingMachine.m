@@ -23,7 +23,7 @@ end
 function mainFrame = initGUI()
 % Define all the required machine data variables
 machineData.coffeeTypes = {'Espresso', 'Cappuccino', 'Americano', 'Latte', 'Mocha', 'Macchiato', 'Flat White', 'Cortado', 'Hot Milk', 'Hot Chocolate'};
-machineData.coffeePrices = [1.50, 2.00, 2.50, 1.75, 2.25, 2.00, 2.25, 2.00, 2.75, 1.75];
+machineData.coffeePrices = [2.50, 3.50, 4.30, 3.00, 5.00, 3.00, 3.75, 4.00, 3.50, 4.20];
 machineData.cupSize = {'small', 'medium', 'large'};
 machineData.coffeePaid = 0;
 machineData.hasChange = 0;
@@ -90,7 +90,7 @@ uicontrol('parent', coffeePanel, 'style', 'pushbutton', 'cdata', coffeeImage, 'u
 
 % Display coffee name and price
 uicontrol('parent', coffeePanel, 'style', 'text', 'string', machineData.coffeeTypes{i}, 'fontsize', 12, 'fontname', 'Calibri', 'backgroundcolor', 'white', 'foregroundcolor', coffeeTextColor, 'units', 'normalized', 'position', [0.05 0.2 0.8 0.1], 'horizontalalignment', 'left', 'fontweight', 'bold');
-uicontrol('parent', coffeePanel, 'style', 'text', 'string', ['$ ' sprintf('%.2f', machineData.coffeePrices(i))], 'fontsize', 12, 'fontname', 'Calibri', 'backgroundcolor', 'white', 'foregroundcolor', '#FF5F1F', 'units', 'normalized', 'position', [0.15 0.05 0.8 0.1], 'horizontalalignment', 'right', 'fontweight', 'bold');
+uicontrol('parent', coffeePanel, 'style', 'text', 'string', ['€ ' sprintf('%.2f', machineData.coffeePrices(i))], 'fontsize', 12, 'fontname', 'Calibri', 'backgroundcolor', 'white', 'foregroundcolor', '#FF5F1F', 'units', 'normalized', 'position', [0.15 0.05 0.8 0.1], 'horizontalalignment', 'right', 'fontweight', 'bold');
 uicontrol('parent', coffeePanel, 'style', 'pushbutton', 'string', 'Select', 'units', 'normalized', 'fontsize', 10, 'fontname', 'Calibri', 'position', [0.05 0.1 0.5 0.1], 'callback', {@coffeePanelCallback, i, mainFrame});
 end
 
@@ -112,7 +112,7 @@ end
 function coffeePanelCallback(hObject, eventdata, coffeeIndex, mainFrame)
 machineData = guidata(mainFrame);
 machineData.coffeeTypes = {'Espresso', 'Cappuccino', 'Americano', 'Latte', 'Mocha', 'Macchiato', 'Flat White', 'Cortado', 'Hot Milk', 'Hot Chocolate'};
-machineData.coffeePrices = [1.50, 2.00, 2.50, 1.75, 2.25, 2.00, 2.25, 2.00, 2.75, 1.75];
+machineData.coffeePrices = [2.50, 3.50, 4.30, 3.00, 5.00, 3.00, 3.75, 4.00, 3.50, 4.20];
 machineData.coffeeStrengths = {'LOW', 'NORMAL', 'STRONG'};
 machineData.sugarLevels = {'NONE', 'LESS', 'NORMAL', 'MORE'};
 
@@ -128,20 +128,20 @@ miniWindow = uipanel('parent', mainFrame, 'backgroundcolor', backgroundColor, 'p
 % Actions menubar
 actions = uimenu('label', 'Actions');
 insertMoneyHeading = uimenu(actions, 'label', '--- Insert Money ---', 'enable', 'off');
-insert1Cent = uimenu(actions, 'label', 'Insert $0.01', 'callback', {@insertMoneyCallback, 0.01, coffeeIndex, mainFrame, miniWindow});
-insert5Cents = uimenu(actions, 'label', 'Insert $0.05', 'callback', {@insertMoneyCallback, 0.05, coffeeIndex, mainFrame, miniWindow});
-insert10Cents = uimenu(actions, 'label', 'Insert $0.10', 'callback', {@insertMoneyCallback, 0.10, coffeeIndex, mainFrame, miniWindow});
-insert25Cents = uimenu(actions, 'label', 'Insert $0.25', 'callback', {@insertMoneyCallback, 0.25, coffeeIndex, mainFrame, miniWindow});
-insert50Cents = uimenu(actions, 'label', 'Insert $0.50', 'callback', {@insertMoneyCallback, 0.50, coffeeIndex, mainFrame, miniWindow});
-insert1Dollar = uimenu(actions, 'label', 'Insert $1.00', 'callback', {@insertMoneyCallback, 1.00, coffeeIndex, mainFrame, miniWindow});
-insert2Dollars = uimenu(actions, 'label', 'Insert $2.00', 'callback', {@insertMoneyCallback, 2.00, coffeeIndex, mainFrame, miniWindow});
-insert5Dollars = uimenu(actions, 'label', 'Insert $5.00', 'callback', {@insertMoneyCallback, 5.00, coffeeIndex, mainFrame, miniWindow});
+insert1Cent = uimenu(actions, 'label', 'Insert €0.01', 'callback', {@insertMoneyCallback, 0.01, coffeeIndex, mainFrame, miniWindow});
+insert2Cents = uimenu(actions, 'label', 'Insert €0.02', 'callback', {@insertMoneyCallback, 0.02, coffeeIndex, mainFrame, miniWindow});
+insert5Cents = uimenu(actions, 'label', 'Insert €0.05', 'callback', {@insertMoneyCallback, 0.05, coffeeIndex, mainFrame, miniWindow});
+insert10Cents = uimenu(actions, 'label', 'Insert €0.10', 'callback', {@insertMoneyCallback, 0.10, coffeeIndex, mainFrame, miniWindow});
+insert20Cents = uimenu(actions, 'label', 'Insert €0.20', 'callback', {@insertMoneyCallback, 0.20, coffeeIndex, mainFrame, miniWindow});
+insert50Cents = uimenu(actions, 'label', 'Insert €0.50', 'callback', {@insertMoneyCallback, 0.50, coffeeIndex, mainFrame, miniWindow});
+insert1Euro = uimenu(actions, 'label', 'Insert €1.00', 'callback', {@insertMoneyCallback, 1.00, coffeeIndex, mainFrame, miniWindow});
+insert2Euros = uimenu(actions, 'label', 'Insert €2.00', 'callback', {@insertMoneyCallback, 2.00, coffeeIndex, mainFrame, miniWindow});
 takeChangeHeading = uimenu(actions, 'label', '--- Ready to Collect Change? ---', 'enable', 'off');
 collectChange = uimenu(actions, 'label', 'Collect Change', 'callback', {@brewAndCollectChange, coffeeIndex, mainFrame});
 takeCoffeeHeading = uimenu(actions, 'label', '--- Ready to Collect Coffee? ---', 'enable', 'off');
 collectCoffee = uimenu(actions, 'label', 'Collect Coffee', 'callback', {@collectCoffeeCallback, mainFrame, miniWindow});
 
-machineData.insertMoneyButtons = [insert1Cent, insert5Cents, insert10Cents, insert25Cents, insert50Cents, insert1Dollar, insert2Dollars, insert5Dollars];
+machineData.insertMoneyButtons = [insert1Cent, insert5Cents, insert10Cents, insert20Cents, insert50Cents, insert1Euro, insert2Euros];
 machineData.collectChange = collectChange;
 machineData.collectCoffee = collectCoffee;
 machineData.actions = actions;
@@ -160,7 +160,7 @@ resizedCoffeeImage = imresize(selectedCoffeeImage, [coffeeImageAxesPos(4) coffee
 imshow(resizedCoffeeImage, 'parent', coffeeImageAxes);
 
 coffeeTypeText = uicontrol('parent', miniWindow, 'style', 'text', 'string', machineData.coffeeTypes{coffeeIndex}, 'units', 'normalized', 'position', [0.35 0.9 0.3 0.1], 'backgroundcolor', backgroundColor, 'foregroundcolor', coffeeTextColor, 'fontsize', 20, 'fontname', 'Calibri', 'horizontalalignment', 'left');
-coffeePriceText = uicontrol('parent', miniWindow, 'style', 'text', 'string', ['$ ' sprintf('%.2f', machineData.coffeePrices(coffeeIndex))], 'fontsize', 14, 'fontname', 'Calibri', 'backgroundcolor', backgroundColor, 'foregroundcolor', '#FF5F1F', 'units', 'normalized', 'position', [0.6 0.9 0.1 0.1], 'horizontalalignment', 'right', 'fontweight', 'bold');
+coffeePriceText = uicontrol('parent', miniWindow, 'style', 'text', 'string', ['€ ' sprintf('%.2f', machineData.coffeePrices(coffeeIndex))], 'fontsize', 14, 'fontname', 'Calibri', 'backgroundcolor', backgroundColor, 'foregroundcolor', '#FF5F1F', 'units', 'normalized', 'position', [0.6 0.9 0.1 0.1], 'horizontalalignment', 'right', 'fontweight', 'bold');
 dividerAxes = axes('parent', miniWindow, 'units', 'normalized', 'position', [0.23 0.4 0.85 1], 'visible', 'off');
 dividerLine = line('parent', dividerAxes, 'xdata', [0.35 0.85], 'ydata', [0.85 0.85], 'color', 'k');
 
@@ -174,7 +174,7 @@ for i = 1 : length(machineData.sugarLevels)
     uicontrol('parent', miniWindow, 'style', 'togglebutton', 'string', machineData.sugarLevels{i}, 'units', 'normalized', 'position', [0.35+(i-1)*0.1 0.5 0.09 0.1], 'backgroundcolor', 'white', 'foregroundcolor', '#FF5F1F', 'fontsize', 10, 'fontname', 'Calibri', 'callback', {@updateButton}, 'fontweight', 'bold');
 end
 
-machineData.userPrompt = uicontrol('parent', miniWindow, 'style', 'text', 'string', sprintf('Please insert $%.2f.', machineData.coffeePrices(coffeeIndex)), 'units', 'normalized', 'position', [0.4 0.3 0.5 0.2], 'backgroundcolor', backgroundColor, 'foregroundcolor', coffeeTextColor, 'fontsize', 12, 'fontname', 'Calibri', 'horizontalalignment', 'center', 'fontweight', 'bold');
+machineData.userPrompt = uicontrol('parent', miniWindow, 'style', 'text', 'string', sprintf('Please insert €%.2f.', machineData.coffeePrices(coffeeIndex)), 'units', 'normalized', 'position', [0.4 0.3 0.5 0.2], 'backgroundcolor', backgroundColor, 'foregroundcolor', coffeeTextColor, 'fontsize', 12, 'fontname', 'Calibri', 'horizontalalignment', 'center', 'fontweight', 'bold');
 guidata(mainFrame, machineData);
 end
 
@@ -189,11 +189,11 @@ function insertMoneyCallback(hObject, eventdata, amount, coffeeIndex, mainFrame,
     machineData.totalInserted = machineData.totalInserted + amount;
     remainingAmount = machineData.coffeePrices(coffeeIndex) - machineData.totalInserted;
     if remainingAmount > 0
-        set(machineData.userPrompt, 'string', sprintf('Please insert $%.2f more.', abs(remainingAmount)));
+        set(machineData.userPrompt, 'string', sprintf('Please insert €%.2f more.', abs(remainingAmount)));
         machineData.coffeePaid = 0;
     else
         change = abs(remainingAmount);
-        set(machineData.userPrompt, 'string', sprintf('Brewing %s. Change: $%.2f.', machineData.coffeeTypes{coffeeIndex}, change));
+        set(machineData.userPrompt, 'string', sprintf('Brewing %s. Change: €%.2f.', machineData.coffeeTypes{coffeeIndex}, change));
         machineData.coffeePaid = 1;
         machineData.hasChange = 1;
     end
