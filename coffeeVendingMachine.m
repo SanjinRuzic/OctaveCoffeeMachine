@@ -5,6 +5,8 @@ clear all;
 close all;
 clc;
 
+player = [];
+
 % Initialize GUI and get the main frame
 mainFrame = initGUI();
 machineData.buttonsEnabled = 1;
@@ -23,11 +25,11 @@ function mainFrame = initGUI()
 machineData.coffeeTypes = {'Espresso', 'Cappuccino', 'Americano', 'Latte', 'Mocha', 'Macchiato', 'Flat White', 'Cortado', 'Hot Milk', 'Hot Chocolate'};
 machineData.coffeePrices = [1.50, 2.00, 2.50, 1.75, 2.25, 2.00, 2.25, 2.00, 2.75, 1.75];
 machineData.cupSize = {'small', 'medium', 'large'};
-machineData.machineStatus = 'idle';
 machineData.coffeePaid = 0;
 machineData.hasChange = 0;
 machineData.buttonsEnabled = 0;
 machineData.enableInteractions = 0;
+machineData.totalInserted = 0;
 
 % These are the colors used for the various elements in the GUI
 backgroundColor = hex2dec({'FF','FA','F0'})'/255;
@@ -50,7 +52,7 @@ mainFramePos =[(screenSize(3) - figureSize(1))/2, (screenSize(4) - figureSize(2)
 % Pre-load all coffee images into a cell array
 coffeeImages = cell(1, length(machineData.coffeeTypes));
 for i = 1:length(coffeeImages)
-    coffeeImages{i} = imread(strcat('./Coffee Images/', machineData.coffeeTypes{i}, '.png'));
+    coffeeImages{i} = imread(strcat('./CoffeeImages/', machineData.coffeeTypes{i}, '.png'));
 end
 
 % Pre-process coffee names and prices into separate arrays
@@ -64,7 +66,7 @@ titleFrame = uipanel('parent', mainFrame, 'backgroundcolor', titleBackgroundColo
 coffeeSelectionFrame = uipanel('parent', mainFrame, 'backgroundcolor', backgroundColor, 'position', [0 0 1 0.9]);
 
 % Text to display the title and the current time
-titleText = uicontrol('parent', titleFrame, 'units', 'normalized', 'style', 'text', 'string', 'COFFEE VENDING MACHINE', 'fontsize', 21, 'fontname', 'Calibri', 'backgroundcolor', titleBackgroundColor, 'foregroundcolor', titleTextColor, 'position', [0.25 0 0.5 1], 'horizontalalignment', 'center', 'fontweight', 'bold');
+titleText = uicontrol('parent', titleFrame, 'units', 'normalized', 'style', 'text', 'string', 'Taste', 'fontsize', 21, 'fontname', 'Calibri', 'backgroundcolor', titleBackgroundColor, 'foregroundcolor', titleTextColor, 'position', [0.25 0 0.5 1], 'horizontalalignment', 'center', 'fontweight', 'bold');
 clockText = uicontrol('parent', titleFrame, 'units', 'normalized', 'style', 'text', 'string', datestr(now, 'HH:MM'), 'fontsize', 16, 'fontname', 'Calibri', 'backgroundcolor', titleBackgroundColor, 'foregroundcolor', titleTextColor, 'position', [0.8 0 0.25 1], 'horizontalalignment', 'center', 'fontweight', 'bold');
 
 spacing = 0.03;
@@ -83,7 +85,7 @@ coffeePanel = uipanel('parent', coffeeSelectionFrame, 'backgroundcolor', 'white'
 uicontrol('parent', coffeePanel, 'style', 'pushbutton', 'units', 'normalized', 'position', [0 0.3 1 0.7], 'callback', {@loadImageCallback, i, coffeeImages, coffeePanel});
 
 % Load images for each type of coffee and display it on the panel
-coffeeImage = imread(strcat('./Coffee Images/', machineData.coffeeTypes{i}, '.png'));
+coffeeImage = imread(strcat('./CoffeeImages/', machineData.coffeeTypes{i}, '.png'));
 uicontrol('parent', coffeePanel, 'style', 'pushbutton', 'cdata', coffeeImage, 'units', 'normalized', 'position', [0 0.3 1 0.7]);
 
 % Display coffee name and price
@@ -94,16 +96,16 @@ end
 
 % Update clock text every second until the main frame is closed
 while ishandle(mainFrame) && ishandle(clockText)
-    set(clockText, 'string', datestr(now, 'HH:MM'));
-    pause(1);
-  end
+set(clockText, 'string', datestr(now, 'HH:MM'));
+pause(1);
+end
 
 guidata(mainFrame, machineData);
 end
 
 % Image loading callback function
 function loadImageCallback(hObject, eventdata, i, coffeeImages, panel)
-    set(hObject, 'cdata', coffeeImages{i});
+set(hObject, 'cdata', coffeeImages{i});
 end
 
 % Callback function for coffee panel click event
@@ -126,22 +128,27 @@ miniWindow = uipanel('parent', mainFrame, 'backgroundcolor', backgroundColor, 'p
 % Actions menubar
 actions = uimenu('label', 'Actions');
 insertMoneyHeading = uimenu(actions, 'label', '--- Insert Money ---', 'enable', 'off');
-insert1Cent = uimenu(actions, 'label', 'Insert $0.01');
-insert5Cents = uimenu(actions, 'label', 'Insert $0.05');
-insert10Cents = uimenu(actions, 'label', 'Insert $0.10');
-insert25Cents = uimenu(actions, 'label', 'Insert $0.25');
-insert50Cents = uimenu(actions, 'label', 'Insert $0.50');
-insert1Dollar = uimenu(actions, 'label', 'Insert $1.00');
-insert2Dollars = uimenu(actions, 'label', 'Insert $2.00');
-insert5Dollars = uimenu(actions, 'label', 'Insert $5.00');
+insert1Cent = uimenu(actions, 'label', 'Insert $0.01', 'callback', {@insertMoneyCallback, 0.01, coffeeIndex, mainFrame, miniWindow});
+insert5Cents = uimenu(actions, 'label', 'Insert $0.05', 'callback', {@insertMoneyCallback, 0.05, coffeeIndex, mainFrame, miniWindow});
+insert10Cents = uimenu(actions, 'label', 'Insert $0.10', 'callback', {@insertMoneyCallback, 0.10, coffeeIndex, mainFrame, miniWindow});
+insert25Cents = uimenu(actions, 'label', 'Insert $0.25', 'callback', {@insertMoneyCallback, 0.25, coffeeIndex, mainFrame, miniWindow});
+insert50Cents = uimenu(actions, 'label', 'Insert $0.50', 'callback', {@insertMoneyCallback, 0.50, coffeeIndex, mainFrame, miniWindow});
+insert1Dollar = uimenu(actions, 'label', 'Insert $1.00', 'callback', {@insertMoneyCallback, 1.00, coffeeIndex, mainFrame, miniWindow});
+insert2Dollars = uimenu(actions, 'label', 'Insert $2.00', 'callback', {@insertMoneyCallback, 2.00, coffeeIndex, mainFrame, miniWindow});
+insert5Dollars = uimenu(actions, 'label', 'Insert $5.00', 'callback', {@insertMoneyCallback, 5.00, coffeeIndex, mainFrame, miniWindow});
 takeChangeHeading = uimenu(actions, 'label', '--- Ready to Collect Change? ---', 'enable', 'off');
-collectChange = uimenu(actions, 'label', 'Collect Change');
+collectChange = uimenu(actions, 'label', 'Collect Change', 'callback', {@brewAndCollectChange, coffeeIndex, mainFrame});
 takeCoffeeHeading = uimenu(actions, 'label', '--- Ready to Collect Coffee? ---', 'enable', 'off');
-collectCoffee = uimenu(actions, 'label', 'Collect Coffee');
+collectCoffee = uimenu(actions, 'label', 'Collect Coffee', 'callback', {@collectCoffeeCallback, mainFrame, miniWindow});
+
+machineData.insertMoneyButtons = [insert1Cent, insert5Cents, insert10Cents, insert25Cents, insert50Cents, insert1Dollar, insert2Dollars, insert5Dollars];
+machineData.collectChange = collectChange;
+machineData.collectCoffee = collectCoffee;
+machineData.actions = actions;
 
 % Display the coffee image on the left side of the panel
 pkg load image;
-selectedCoffeeImage = imread(strcat('./Coffee Images/', machineData.coffeeTypes{coffeeIndex}, '.png'));
+selectedCoffeeImage = imread(strcat('./CoffeeImages/', machineData.coffeeTypes{coffeeIndex}, '.png'));
 coffeeImageAxes = axes('parent', miniWindow, 'units', 'normalized', 'position', [0 0 0.3 1], 'visible', 'off', 'color', backgroundColor);
 
 coffeeImageAxesUnits = get(coffeeImageAxes, 'units');
@@ -167,7 +174,74 @@ for i = 1 : length(machineData.sugarLevels)
     uicontrol('parent', miniWindow, 'style', 'togglebutton', 'string', machineData.sugarLevels{i}, 'units', 'normalized', 'position', [0.35+(i-1)*0.1 0.5 0.09 0.1], 'backgroundcolor', 'white', 'foregroundcolor', '#FF5F1F', 'fontsize', 10, 'fontname', 'Calibri', 'callback', {@updateButton}, 'fontweight', 'bold');
 end
 
-outputMessage = uicontrol('parent', miniWindow, 'style', 'text', 'string', 'placeholder', 'units', 'normalized', 'position', [0.3 0.3 0.3 0.1], 'backgroundcolor', backgroundColor, 'foregroundcolor', coffeeTextColor, 'fontsize', 16, 'fontname', 'Calibri', 'horizontalalignment', 'center');
+machineData.userPrompt = uicontrol('parent', miniWindow, 'style', 'text', 'string', sprintf('Please insert $%.2f.', machineData.coffeePrices(coffeeIndex)), 'units', 'normalized', 'position', [0.4 0.3 0.5 0.2], 'backgroundcolor', backgroundColor, 'foregroundcolor', coffeeTextColor, 'fontsize', 12, 'fontname', 'Calibri', 'horizontalalignment', 'center', 'fontweight', 'bold');
+guidata(mainFrame, machineData);
+end
+
+% This function handles the insertion of coins into the machine and change calculation
+function insertMoneyCallback(hObject, eventdata, amount, coffeeIndex, mainFrame, miniWindow)
+machineData = guidata(mainFrame);
+backgroundColor = hex2dec({'FF','FA','F0'})'/255;
+coffeeTextColor = hex2dec({'00','00','00'})'/255;
+
+machineData.totalInserted = 0;
+machineData.totalInserted = machineData.totalInserted + amount;
+remainingAmount = machineData.coffeePrices(coffeeIndex) - machineData.totalInserted;
+
+if remainingAmount > 0
+    set(machineData.userPrompt, 'string', sprintf('Please insert $%.2f more.', remainingAmount));
+    machineData.coffeePaid = 0;
+elseif remainingAmount <= 0
+    change = abs(remainingAmount);
+    set(machineData.userPrompt, 'string', sprintf('Brewing %s. Change: $%.2f.', machineData.coffeeTypes{coffeeIndex}, change));
+    machineData.coffeePaid = 1;
+    machineData.hasChange = 1;
+    machineData.coffeePrices(coffeeIndex) = 0;
+    machineData.totalInserted = 0;
+set(machineData.collectCoffee, 'enable', 'off');
+end
+
+guidata(mainFrame, machineData);
+end
+
+% Playing sound while coffee is being brewed
+function playAudio()
+  persistent player;
+  if isempty(player) || ~isplaying(player)
+    [y, fs] = audioread('./Sounds/01_Brewing.wav');
+    player = audioplayer(y, fs);
+    play(player);
+  end
+end
+
+% Callback that handles change collection
+function brewAndCollectChange(hObject, eventdata, coffeeIndex, mainFrame)
+machineData = guidata(mainFrame);
+machineData.coffeePaid = 1;
+machineData.hasChange = 1;
+
+if machineData.coffeePaid == 1 && machineData.hasChange == 1
+set(machineData.insertMoneyButtons, 'enable', 'off');
+set(machineData.collectChange, 'enable', 'off');
+set(machineData.userPrompt, 'string', sprintf('Your coffee is being made. Please wait...'));
+playAudio();
+pause(52);
+set(machineData.userPrompt, 'string', sprintf('Your coffee is ready! Please collect it and enjoy!'));
+set(machineData.collectCoffee, 'enable', 'on');
+endif
+
+guidata(mainFrame, machineData);
+end
+
+% Wrap up the process, close mini window and delete menubar
+function collectCoffeeCallback(hObject, eventdata, mainFrame, miniWindow)
+machineData = guidata(mainFrame);
+set(machineData.userPrompt, 'string', sprintf('Thank you! Ready to take new order.'));
+set(machineData.collectCoffee, 'enable', 'off');
+pause(8);
+delete(miniWindow);
+set(machineData.actions, 'enable', 'off');
+
 guidata(mainFrame, machineData);
 end
 
