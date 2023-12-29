@@ -244,7 +244,7 @@ set(machineData.actions, 'enable', 'off');
 guidata(mainFrame, machineData);
 end
 
-% Callback function to update the buttons when one is clicked
+% Callback function to handle the button groups and color changes
 function updateButton(hObject, ~, buttonIndex)
 buttonGroup = get(hObject, 'tag');
 allButtons = findobj('style', 'togglebutton');
