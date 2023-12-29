@@ -166,12 +166,12 @@ dividerLine = line('parent', dividerAxes, 'xdata', [0.35 0.85], 'ydata', [0.85 0
 
 uicontrol('parent', miniWindow, 'style', 'text', 'string', 'Coffee Strength', 'units', 'normalized', 'position', [0.35 0.8 0.3 0.05], 'backgroundcolor', backgroundColor, 'foregroundcolor', 'black', 'fontsize', 14, 'fontname', 'Calibri');
 for i = 1 : length(machineData.coffeeStrengths)
-uicontrol('parent', miniWindow, 'style', 'togglebutton', 'string', machineData.coffeeStrengths{i}, 'units', 'normalized', 'position', [0.35+(i-1)*0.1 0.7 0.09 0.09], 'backgroundcolor', 'white', 'foregroundcolor', '#FF5F1F', 'fontsize', 10, 'fontname', 'Calibri', 'callback', {@updateButton}, 'fontweight', 'bold');
+uicontrol('parent', miniWindow, 'style', 'togglebutton', 'tag', 'coffeeStrength', 'string', machineData.coffeeStrengths{i}, 'units', 'normalized', 'position', [0.35+(i-1)*0.1 0.7 0.09 0.09], 'backgroundcolor', 'white', 'foregroundcolor', '#FF5F1F', 'fontsize', 10, 'fontname', 'Calibri', 'callback', {@updateButton}, 'fontweight', 'bold');
 end
 
 uicontrol('parent', miniWindow, 'style', 'text', 'string', 'Sugar Level', 'units', 'normalized', 'position', [0.35 0.6 0.3 0.08], 'backgroundcolor', backgroundColor, 'foregroundcolor', 'black', 'fontsize', 14, 'fontname', 'Calibri');
 for i = 1 : length(machineData.sugarLevels)
-    uicontrol('parent', miniWindow, 'style', 'togglebutton', 'string', machineData.sugarLevels{i}, 'units', 'normalized', 'position', [0.35+(i-1)*0.1 0.5 0.09 0.1], 'backgroundcolor', 'white', 'foregroundcolor', '#FF5F1F', 'fontsize', 10, 'fontname', 'Calibri', 'callback', {@updateButton}, 'fontweight', 'bold');
+uicontrol('parent', miniWindow, 'style', 'togglebutton', 'tag', 'sugarLevel', 'string', machineData.sugarLevels{i}, 'units', 'normalized', 'position', [0.35+(i-1)*0.1 0.5 0.09 0.1], 'backgroundcolor', 'white', 'foregroundcolor', '#FF5F1F', 'fontsize', 10, 'fontname', 'Calibri', 'callback', {@updateButton}, 'fontweight', 'bold');
 end
 
 machineData.userPrompt = uicontrol('parent', miniWindow, 'style', 'text', 'string', sprintf('Please insert €%.2f.', machineData.coffeePrices(coffeeIndex)), 'units', 'normalized', 'position', [0.4 0.3 0.5 0.2], 'backgroundcolor', backgroundColor, 'foregroundcolor', coffeeTextColor, 'fontsize', 12, 'fontname', 'Calibri', 'horizontalalignment', 'center', 'fontweight', 'bold');
@@ -205,12 +205,12 @@ end
 
 % Playing sound while coffee is being brewed
 function playAudio()
-  persistent player;
-  if isempty(player) || ~isplaying(player)
-    [y, fs] = audioread('./Sounds/01_Brewing.wav');
-    player = audioplayer(y, fs);
-    play(player);
-  end
+persistent player;
+if isempty(player) || ~isplaying(player)
+[y, fs] = audioread('./Sounds/01_Brewing.wav');
+player = audioplayer(y, fs);
+play(player);
+end
 end
 
 % Callback that handles change collection
@@ -246,19 +246,17 @@ end
 
 % Callback function to update the buttons when one is clicked
 function updateButton(hObject, ~, buttonIndex)
-
+buttonGroup = get(hObject, 'tag');
 allButtons = findobj('style', 'togglebutton');
+buttonsInGroup = allButtons(strcmp(get(allButtons, 'tag'), buttonGroup));
 
-% Deselect all buttons and set their color to white with orange text
-set(allButtons, 'value', 0, 'backgroundcolor', 'white', 'foregroundcolor', '#FF5F1F');
-
-% Select the clicked button and change its color to orange with white text
+set(buttonsInGroup, 'value', 0, 'backgroundcolor', 'white', 'foregroundcolor', '#FF5F1F');
 set(hObject, 'value', 1, 'backgroundcolor', '#FF5F1F', 'foregroundcolor', 'white');
+
+selectedButton = findobj(buttonsInGroup, 'value', 1);
+if ~isempty(selectedButton) && selectedButton ~= hObject
+set(selectedButton, 'value', 0, 'backgroundcolor', 'white', 'foregroundcolor', '#FF5F1F');
 end
-
-
-
-
-
+end
 
 
