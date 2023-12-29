@@ -180,26 +180,26 @@ end
 
 % This function handles the insertion of coins into the machine and change calculation
 function insertMoneyCallback(hObject, eventdata, amount, coffeeIndex, mainFrame, miniWindow)
-    machineData = guidata(mainFrame);
+machineData = guidata(mainFrame);
 
-    if ~isfield(machineData, 'totalInserted')
-        machineData.totalInserted = 0;
-    end
+if ~isfield(machineData, 'totalInserted')
+machineData.totalInserted = 0;
+end
 
-    machineData.totalInserted = machineData.totalInserted + amount;
-    remainingAmount = machineData.coffeePrices(coffeeIndex) - machineData.totalInserted;
-    if remainingAmount > 0
-        set(machineData.userPrompt, 'string', sprintf('Please insert €%.2f more.', abs(remainingAmount)));
-        machineData.coffeePaid = 0;
-    else
-        change = abs(remainingAmount);
-        set(machineData.userPrompt, 'string', sprintf('Brewing %s. Change: €%.2f.', machineData.coffeeTypes{coffeeIndex}, change));
-        machineData.coffeePaid = 1;
-        machineData.hasChange = 1;
-    end
+machineData.totalInserted = machineData.totalInserted + amount;
+remainingAmount = machineData.coffeePrices(coffeeIndex) - machineData.totalInserted;
+if remainingAmount > 0
+set(machineData.userPrompt, 'string', sprintf('Please insert €%.2f more.', abs(remainingAmount)));
+machineData.coffeePaid = 0;
+else
+change = abs(remainingAmount);
+set(machineData.userPrompt, 'string', sprintf('Brewing %s. Change: €%.2f.', machineData.coffeeTypes{coffeeIndex}, change));
+machineData.coffeePaid = 1;
+machineData.hasChange = 1;
+end
 
-    set(machineData.collectCoffee, 'enable', 'off');
-    guidata(mainFrame, machineData);
+set(machineData.collectCoffee, 'enable', 'off');
+guidata(mainFrame, machineData);
 end
 
 
