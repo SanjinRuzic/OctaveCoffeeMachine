@@ -178,15 +178,28 @@ machineData.userPrompt = uicontrol('parent', miniWindow, 'style', 'text', 'strin
 guidata(mainFrame, machineData);
 end
 
+function playCoinSlotAudio()
+persistent player;
+if isempty(player) || ~isplaying(player)
+[y, fs] = audioread('./Sounds/02_Coin.wav');
+player = audioplayer(y, fs);
+play(player);
+end
+end
+
 % This function handles the insertion of coins into the machine and change calculation
 function insertMoneyCallback(hObject, eventdata, amount, coffeeIndex, mainFrame, miniWindow)
 machineData = guidata(mainFrame);
+playCoinSlotAudio();
 
 if ~isfield(machineData, 'totalInserted')
 machineData.totalInserted = 0;
 end
 
 machineData.totalInserted = machineData.totalInserted + amount;
+totalInsertedText = uicontrol('parent', miniWindow, 'style', 'text', 'string', 'Money Inserted:', 'units', 'normalized', 'position', [0.32 0.25 0.3 0.1], 'fontsize', 11, 'fontname', 'Calibri', 'foregroundcolor', '#000000', 'backgroundcolor', '#FFFAF0', 'horizontalalignment', 'left', 'fontweight', 'bold');
+totalInsertedAmount = uicontrol('parent', miniWindow, 'style', 'text', 'string', sprintf('€%.2f', machineData.totalInserted), 'units', 'normalized', 'position', [0.49 0.25 0.3 0.1], 'foregroundcolor', '#FF5F1F', 'fontsize', 11, 'fontname', 'Calibri', 'foregroundcolor', '#FF5F1F', 'backgroundcolor', '#FFFAF0', 'horizontalalignment', 'left', 'fontweight', 'bold');
+
 remainingAmount = machineData.coffeePrices(coffeeIndex) - machineData.totalInserted;
 if remainingAmount > 0
 set(machineData.userPrompt, 'string', sprintf('Please insert €%.2f more.', abs(remainingAmount)));
@@ -204,7 +217,7 @@ end
 
 
 % Playing sound while coffee is being brewed
-function playAudio()
+function playBrewingAudio()
 persistent player;
 if isempty(player) || ~isplaying(player)
 [y, fs] = audioread('./Sounds/01_Brewing.wav');
@@ -223,7 +236,7 @@ if machineData.coffeePaid == 1 && machineData.hasChange == 1
 set(machineData.insertMoneyButtons, 'enable', 'off');
 set(machineData.collectChange, 'enable', 'off');
 set(machineData.userPrompt, 'string', sprintf('Your coffee is being made. Please wait...'));
-playAudio();
+playBrewingAudio();
 pause(52);
 set(machineData.userPrompt, 'string', sprintf('Your coffee is ready! Please collect it and enjoy!'));
 set(machineData.collectCoffee, 'enable', 'on');
