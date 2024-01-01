@@ -178,6 +178,7 @@ machineData.userPrompt = uicontrol('parent', miniWindow, 'style', 'text', 'strin
 guidata(mainFrame, machineData);
 end
 
+# Playing sound for coin insertion
 function playCoinSlotAudio()
 persistent player;
 if isempty(player) || ~isplaying(player)
