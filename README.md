@@ -7,5 +7,5 @@ This project is an interactive simulation of a coffee vending machine, developed
 💰 **Menubar** for **coin insertion, change and coffee collection** <br />
 🎵 **Audio playback** <br />
 🔄 **Prompt message alteration** <br />
-💪 **Customizable preferences** for users to tailor the coffee experience <br />
+💪 **Customizable preferences** <br />
 And more!
