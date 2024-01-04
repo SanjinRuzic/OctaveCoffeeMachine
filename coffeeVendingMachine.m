@@ -22,45 +22,6 @@ end
 
 function mainFrame = initGUI()
 
-% Declare global variables for machine stats
-global totalCoffeeMade;
-global machineBalance;
-global waterLevel;
-global coffeeBeans;
-
-% Load machine state from file if it exists
-filePath = fullfile('C:', 'Users', 'durop', 'Desktop', 'coffeeMachineSimulation', 'm_inv.txt');
-if exist(filePath, 'file')
-fid = fopen(filePath, 'r');
-fileData = textscan(fid, '%s', 'delimiter', '\n');
-fclose(fid);
-
-if isempty(fileData{1})
-totalCoffeeMade = 0;
-machineBalance = 100;
-waterLevel = 5000;
-coffeeBeans = 1000;
-
-else
-textLine1 = fileData{1}{1};
-textLine2 = fileData{1}{2};
-textLine3 = fileData{1}{3};
-textLine4 = fileData{1}{4};
-
-coffeeMadeStartIndex = strfind(textLine1, 'Coffee Made: ') + 13;
-totalCoffeeMade = str2num(textLine1(coffeeMadeStartIndex:end));
-
-balanceStartIndex = strfind(textLine2, 'Balance: ') + 9;
-machineBalance = str2num(textLine2(balanceStartIndex:end));
-
-waterLevelStartIndex = strfind(textLine3, 'Water Level: ') + 13;
-waterLevel = str2num(textLine3(waterLevelStartIndex:end));
-
-coffeeBeansStartIndex = strfind(textLine4, 'Coffee Beans: ') + 14;
-coffeeBeans = str2num(textLine4(coffeeBeansStartIndex:end));
-end
-end
-
 % Define machine data structure
 machineData.coffeeTypes = {'Espresso', 'Cappuccino', 'Americano', 'Latte', 'Mocha', 'Macchiato', 'Flat White', 'Cortado', 'Hot Milk', 'Hot Chocolate'};
 machineData.coffeePrices = [2.50, 3.50, 4.30, 3.00, 5.00, 3.00, 3.75, 4.00, 3.50, 4.20];
@@ -83,7 +44,7 @@ mainFramePos =[(screenSize(3) - figureSize(1))/2, (screenSize(4) - figureSize(2)
 
 % Pre-load coffee images
 coffeeImages = cell(1, length(machineData.coffeeTypes));
-for i = 1:length(coffeeImages)
+for i = 1 : length(coffeeImages)
 coffeeImages{i} = imread(strcat('./CoffeeImages/', machineData.coffeeTypes{i}, '.png'));
 end
 
@@ -108,7 +69,7 @@ panelHeight = (1 - 5 * spacing)/2;
 
 % Create and arrange coffee panels
 for i = 1 : length(machineData.coffeeTypes)
-row = floor((i-1)/5);
+row = floor((i - 1)/5);
 col = mod(i - 1, 5);
 panelX = spacing + col * (panelWidth + spacing);
 panelY = 1 - spacing - (row + 1) * (panelHeight + spacing);
@@ -157,8 +118,47 @@ buttonColor = hex2dec({'5A','5A','5A'})'/255;
 titleTextColor = hex2dec({'FF','FF','FF'})'/255;
 coffeeTextColor = hex2dec({'00','00','00'})'/255;
 
+% Declare global variables for machine stats
+global totalCoffeeMade;
+global machineBalance;
 global waterLevel;
 global coffeeBeans;
+
+% Load machine inventory file data
+scriptPath = mfilename('fullpath');
+scriptDir = fileparts(scriptPath);
+filePath = fullfile(scriptDir, 'm_inv.txt');
+
+if exist(filePath, 'file')
+fid = fopen(filePath, 'r');
+fileData = textscan(fid, '%s', 'delimiter', '\n');
+fclose(fid);
+
+if isempty(fileData{1})
+totalCoffeeMade = 0;
+machineBalance = 100;
+waterLevel = 5000;
+coffeeBeans = 1000;
+
+else
+textLine1 = fileData{1}{1};
+textLine2 = fileData{1}{2};
+textLine3 = fileData{1}{3};
+textLine4 = fileData{1}{4};
+
+coffeeMadeStartIndex = strfind(textLine1, 'Coffee Made: ') + 13;
+totalCoffeeMade = str2num(textLine1(coffeeMadeStartIndex:end));
+
+balanceStartIndex = strfind(textLine2, 'Balance: ') + 9;
+machineBalance = str2num(textLine2(balanceStartIndex:end));
+
+waterLevelStartIndex = strfind(textLine3, 'Water Level: ') + 13;
+waterLevel = str2num(textLine3(waterLevelStartIndex:end));
+
+coffeeBeansStartIndex = strfind(textLine4, 'Coffee Beans: ') + 14;
+coffeeBeans = str2num(textLine4(coffeeBeansStartIndex:end));
+end
+end
 
 % Create mini window panel
 miniWindow = uipanel('parent', mainFrame, 'backgroundcolor', backgroundColor, 'position', [0.1 0.1 0.8 0.8]);
@@ -274,6 +274,7 @@ set(machineData.userPrompt, 'string', 'Insufficient machine balance to provide c
 else
 machineBalance = machineBalance - change;
 set(machineData.userPrompt, 'string', sprintf('Brewing %s. Change: €%.2f.', machineData.coffeeTypes{coffeeIndex}, change));
+set(machineData.collectChange, 'enable', 'on');
 machineData.coffeePaid = 1;
 machineData.hasChange = 1;
 
@@ -332,7 +333,10 @@ set(machineData.userPrompt, 'string', sprintf('Thank you! Aborting in 10 seconds
 set(machineData.collectCoffee, 'enable', 'off');
 
 % Updates inventory and balance
-filePath = fullfile('C:', 'Users', 'durop', 'Desktop', 'coffeeMachineSimulation', 'm_inv.txt');
+scriptPath = mfilename('fullpath');
+scriptDir = fileparts(scriptPath);
+filePath = fullfile(scriptDir, 'm_inv.txt');
+
 fid = fopen(filePath, 'w+');
 totalCoffeeMade = totalCoffeeMade + 1;
 fprintf(fid, 'Total Coffee Made: %d\n', totalCoffeeMade);
@@ -344,6 +348,7 @@ coffeeBeans = coffeeBeans - coffeeUsage;
 fprintf(fid, 'Water Level: %d\n', waterLevel);
 fprintf(fid, 'Coffee Beans: %d\n', coffeeBeans);
 fclose(fid);
+
 
 % Close mini window and delete menubar
 pause(10);

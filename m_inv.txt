@@ -1,4 +1,4 @@
-Total Coffee Made: 3
-Machine Balance: 100
-Water Level: 5000
-Coffee Beans: 1000
+Total Coffee Made: 7
+Machine Balance: 115.6
+Water Level: 4600
+Coffee Beans: 970
